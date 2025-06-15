@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import History from "./History";
 import ChihuahuaHead from "./ChihuahuaHead";
+import Modal from "./Modal";
 
 const BUTTONS = [
   "(", ")", "⌫", "C",
-  "%", // Ajout ici
-  "7", "8", "9", "/",
+  "%", "7", "8", "9", "/",
   "4", "5", "6", "*",
   "1", "2", "3", "-",
   "0", ".", "+", "=",
@@ -19,6 +19,7 @@ function App() {
   const [result, setResult] = useState<string | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [dark, setDark] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const mobile = isMobile();
 
   // Charger l'historique depuis le localStorage au démarrage
@@ -75,16 +76,17 @@ function App() {
     <div
       style={{
         minHeight: "100vh",
-        width: "100vw",
+        width: "100%",
+        maxHeight: "100vh",
+        overflow: "auto",
         background: dark ? "#222" : "#fffbe6",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "flex-start",
+        justifyContent: "center",
         position: "relative",
         padding: 0,
         boxSizing: "border-box",
-        overflow: "hidden",
       }}
     >
       {/* Bouton thème */}
@@ -113,127 +115,169 @@ function App() {
         {dark ? "☀️" : "🌙"}
       </button>
 
+      {/* Calculatrice */}
       <div
-        className="main-flex"
+        className="calculator-container"
         style={{
+          background: "transparent",
+          border: "none",
+          boxShadow: "none",
+          padding: 0,
+          width: "100%",
+          maxWidth: 350,
+          margin: "0 auto",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          width: "100vw",
-          maxWidth: "100vw",
-          padding: 0,
-          margin: 0,
-          gap: 0,
+          position: "relative",
+          overflow: "hidden",
+          minHeight: 480, // pour laisser la place à la tête
         }}
       >
-        {/* Historique compact en haut */}
+        {/* Tête du chihuahua en fond */}
         <div
           style={{
-            width: "94vw",
-            maxWidth: 400,
-            margin: "16px auto 0 auto",
-            maxHeight: 120,
-            overflowY: "auto",
-            flexShrink: 0,
+            position: "absolute",
+            top: "-40px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "110%",
+            zIndex: 0,
+            opacity: 0.25, // augmente l'opacité pour mieux voir la tête
+            pointerEvents: "none",
+            userSelect: "none",
           }}
+          aria-hidden="true"
         >
-          <History history={history} />
+          <ChihuahuaHead size={340} />
         </div>
+        <div style={{ width: "100%", zIndex: 1, position: "relative" }}>
+          {/* Cadran aligné */}
+          <div
+            style={{
+              width: "100%",
+              marginBottom: 8,
+              background: dark
+                ? "rgba(34,34,34,0.75)" // plus transparent pour voir la tête
+                : "rgba(255,251,230,0.85)", // plus transparent pour voir la tête
+              borderRadius: 16,
+              boxShadow: "0 2px 8px #0002",
+              border: "2px solid #e0b97a", // bordure dorée pour délimiter
+              padding: 12,
+              textAlign: "center",
+              position: "relative",
+              zIndex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: 80,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 18,
+                minHeight: 24,
+                color: dark ? "#ffe5b4" : "#7b4a00", // texte plus foncé pour contraster
+                width: "100%",
+                textAlign: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {input || "0"}
+            </div>
+            <div
+              style={{
+                fontSize: 28,
+                minHeight: 32,
+                color: result !== null ? "#388e3c" : (dark ? "#ffe5b4" : "#7b4a00"),
+                fontWeight: "bold",
+                marginBottom: 0,
+                width: "100%",
+                textAlign: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {result !== null ? result : ""}
+            </div>
+          </div>
 
-        {/* Calculatrice bien large */}
-        <div
-          className="calculator-container"
-          style={{
-            background: "transparent",
-            border: "none",
-            boxShadow: "none",
-            padding: 0,
-            width: "100vw",
-            maxWidth: 420,
-            margin: "0 auto",
-          }}
-        >
-          <ChihuahuaHead>
-            <div
+          {/* Pavé de touches aligné */}
+          <div
+            className="calculator-buttons"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: 4,
+              width: "100%",
+              position: "relative",
+              zIndex: 1,
+            }}
+          >
+            {/* Bouton historique */}
+            <button
+              onClick={() => setShowHistory(true)}
               style={{
-                width: "100%",
-                maxWidth: 256,
-                margin: "0 auto",
+                gridColumn: "span 4",
+                background: "#e0b97a",
+                color: "#222",
+                fontWeight: "bold",
+                fontSize: 18,
                 marginBottom: 8,
-                background: dark ? "rgba(34,34,34,0.85)" : "rgba(255,255,255,0.7)",
+                border: "none",
                 borderRadius: 12,
-                boxShadow: "0 2px 8px #0002",
-                padding: 8,
+                padding: "10px 0",
+                boxShadow: "0 2px 6px #0002",
+                cursor: "pointer",
               }}
             >
-              <div
+              📜 Historique
+            </button>
+            {BUTTONS.map((btn) => (
+              <button
+                key={btn}
+                onClick={() => handleClick(btn)}
                 style={{
-                  fontSize: 18,
-                  minHeight: 24,
-                  textAlign: "right",
-                  color: dark ? "#ffe5b4" : "#555",
+                  fontSize: mobile ? 28 : 20,
+                  padding: mobile ? 18 : 12,
+                  background: btn === "="
+                    ? "#e0b97a"
+                    : dark
+                      ? "rgba(68, 68, 68, 0.15)"
+                      : "rgba(255, 229, 180, 0.92)", // plus opaque, plus lisible
+                  color: btn === "="
+                    ? "#222"
+                    : dark
+                    ? "#ffe5b4"
+                    : "#7b4a00",
+                  border: "1.5px solid #e0b97a",
+                  borderRadius: 12,
+                  margin: 2,
+                  boxShadow: "0 2px 6px #e0b97a",
+                  transition: "background 0.2s",
+                  fontWeight: btn === "=" ? "bold" : "normal",
+                  gridColumn: btn === "=" ? "span 4" : undefined,
+                  backdropFilter: btn === "=" ? undefined : "blur(2px)",
+                  zIndex: 1,
                 }}
               >
-                {input || "0"}
-              </div>
-              <div
-                style={{
-                  fontSize: 28,
-                  minHeight: 32,
-                  textAlign: "right",
-                  color: result !== null ? "#388e3c" : (dark ? "#ffe5b4" : "#fff8e1"),
-                  fontWeight: "bold",
-                  marginBottom: 8,
-                }}
-              >
-                {result !== null ? result : ""}
-              </div>
-            </div>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 8,
-                marginBottom: 8,
-                width: "100%",
-                maxWidth: 256,
-              }}
-            >
-              {BUTTONS.map((btn) => (
-                <button
-                  key={btn}
-                  onClick={() => handleClick(btn)}
-                  style={{
-                    fontSize: mobile ? 28 : 20,
-                    padding: mobile ? 18 : 12,
-                    background: btn === "="
-                      ? "#e0b97a"
-                      : dark
-                      ? "#444"
-                      : "#222",
-                    color: btn === "="
-                      ? "#222"
-                      : dark
-                      ? "#ffe5b4"
-                      : "#fffbe6",
-                    border: "none",
-                    borderRadius: 12,
-                    margin: 2,
-                    boxShadow: "0 2px 6px #0002",
-                    transition: "background 0.2s",
-                    fontWeight: btn === "=" ? "bold" : "normal",
-                    gridColumn: btn === "=" ? "span 4" : undefined,
-                  }}
-                >
-                  {btn}
-                </button>
-              ))}
-            </div>
-          </ChihuahuaHead>
+                {btn}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
+      {/* Modale historique */}
+      <Modal open={showHistory} onClose={() => setShowHistory(false)}>
+        <History history={history} />
+      </Modal>
     </div>
   );
 }
 
 export default App;
+

@@ -1,14 +1,15 @@
 import React from "react";
 
-const ChihuahuaHead: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const ChihuahuaHead: React.FC<{ size?: number; className?: string }> = ({ size = 120, className }) => (
   <div
+    className={className}
     style={{
       position: "relative",
-      width: "94vw",
-      maxWidth: 400,
-      minWidth: 220,
+      width: size,
+      maxWidth: size,
+      minWidth: 60,
       margin: "0 auto",
-      marginBottom: 16,
+      marginBottom: 8,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -16,15 +17,11 @@ const ChihuahuaHead: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   >
     <svg
       viewBox="0 0 320 260"
-      width="90vw"
-      height="auto"
+      width={size}
+      height={size * 0.8}
       style={{
-        maxWidth: 400,
-        minWidth: 220,
-        position: "absolute",
-        top: 0,
-        left: 0,
-        zIndex: 0,
+        maxWidth: size,
+        minWidth: 100,
         pointerEvents: "none",
       }}
     >
@@ -102,22 +99,6 @@ const ChihuahuaHead: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         fill="none"
       />
     </svg>
-    <div
-      style={{
-        position: "relative",
-        zIndex: 1,
-        padding: "110px 8px 16px 8px",
-        width: "100%",
-        maxWidth: 400,
-        minWidth: 220,
-        boxSizing: "border-box",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      {children}
-    </div>
   </div>
 );
 
