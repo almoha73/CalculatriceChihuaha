@@ -1,0 +1,17 @@
+{
+  "name": "Node.js & TypeScript",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:18",
+
+  // Commande à lancer après la création du conteneur
+  "postCreateCommand": "npm install -g npm@latest && npm install",
+
+  "forwardPorts": [5173],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
+}

@@ -1,29 +1,11 @@
 import React from "react";
 
-const ChihuahuaHead: React.FC<{ size?: number; className?: string }> = ({ 
-  size = 280, 
-  className 
-}) => (
-  <div
-    className={className}
-    style={{
-      position: "relative",
-      width: size,
-      maxWidth: size,
-      margin: "0 auto",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-    }}
-  >
+// Ce composant "simple" accepte des classes Tailwind pour être stylisé par son parent.
+const ChihuahuaHead: React.FC<{ className?: string }> = ({ className }) => (
+  <div className={className}>
     <svg
       viewBox="0 0 320 260"
-      width={size}
-      height={size * 0.8}
-      style={{
-        maxWidth: size,
-        pointerEvents: "none",
-      }}
+      className="h-full w-full" // Le SVG remplira son conteneur
     >
       {/* Oreille gauche */}
       <path
