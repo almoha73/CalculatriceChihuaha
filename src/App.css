@@ -1,0 +1,85 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.calculator-container {
+  max-width: 350px;
+  width: 100%;
+  border: 2px solid #e0b97a;
+  border-radius: 16px;
+  padding: 24px;
+  background: #fff; /* blanc pur pour bien contraster */
+  box-shadow: 0 8px 32px #b48a4a33;
+  margin: 0 auto;
+}
+
+@media (max-width: 700px) {
+  .main-flex {
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .calculator-container {
+    max-width: 98vw !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .history-container {
+    min-width: unset !important;
+    max-width: 95vw !important;
+    width: 100% !important;
+    margin-top: 8px !important;
+    margin-left: 0 !important;
+    max-height: 120px !important;
+    overflow-y: auto !important;
+  }
+  body {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+}
