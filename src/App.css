@@ -65,13 +65,13 @@
   }
   
   .calculator-buttons {
-    gap: 6px !important;
+    gap: 4px !important;
   }
   
   .calculator-buttons button {
-    font-size: 16px !important;
-    padding: 12px 4px !important;
-    min-height: 45px !important;
+    font-size: 15px !important;
+    padding: 10px 4px !important;
+    min-height: 42px !important;
   }
 }
 

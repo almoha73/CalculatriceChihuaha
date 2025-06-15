@@ -12,7 +12,16 @@ const BUTTONS = [
   "0", ".", "+", "=",
 ];
 
-const isMobile = () => window.innerWidth <= 700;
+// Fonction pour rafraîchir le layout lors du redimensionnement de la fenêtre
+function useWindowWidth() {
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  return width;
+}
 
 function App() {
   const [input, setInput] = useState("");
@@ -20,9 +29,71 @@ function App() {
   const [history, setHistory] = useState<string[]>([]);
   const [dark, setDark] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const mobile = isMobile();
 
-  // Charger les données depuis le localStorage
+  // ==================================================================
+  // NOUVELLE GESTION RESPONSIVE PAR POINTS DE RUPTURE (BREAKPOINTS)
+  // ==================================================================
+  const screenWidth = useWindowWidth();
+  const isSmall = screenWidth < 768;   // Pour téléphones
+  const isMedium = screenWidth >= 768 && screenWidth < 1024; // Pour tablettes
+  // Le cas "desktop" est géré par défaut (else)
+
+  let headSize, headMarginBottom, calculatorPadding, screenMarginBottom, 
+      screenMinHeight, historyButtonMarginBottom, buttonsGap, buttonMinHeight,
+      mainContainerPadding, justifyContent, buttonFontSize, buttonPadding,
+      themeButtonPadding, themeButtonFontSize;
+
+  if (isSmall) {
+    // --- Styles pour petits écrans (< 768px) ---
+    justifyContent = "flex-start";
+    mainContainerPadding = "10px 10px 20px 10px"; // Plus d'espace en bas
+    headSize = 180;
+    headMarginBottom = "-45px";
+    calculatorPadding = "45px 16px 15px";
+    screenMarginBottom = 12;
+    screenMinHeight = 70;
+    historyButtonMarginBottom = 12;
+    buttonsGap = 8;
+    buttonMinHeight = 44;
+    buttonFontSize = 20;
+    buttonPadding = "16px 8px";
+    themeButtonPadding = "6px 8px";
+    themeButtonFontSize = 14;
+  } else if (isMedium) {
+    // --- Styles pour écrans moyens (tablettes, 768px - 1024px) ---
+    justifyContent = "center";
+    mainContainerPadding = "20px";
+    headSize = 260;
+    headMarginBottom = "-60px";
+    calculatorPadding = "80px 20px 20px";
+    screenMarginBottom = 20;
+    screenMinHeight = 90;
+    historyButtonMarginBottom = 16;
+    buttonsGap = 10;
+    buttonMinHeight = 55;
+    buttonFontSize = 22;
+    buttonPadding = "18px 12px";
+    themeButtonPadding = "8px 10px";
+    themeButtonFontSize = 16;
+  } else {
+    // --- Styles par défaut (desktop, > 1024px) ---
+    justifyContent = "center";
+    mainContainerPadding = "20px";
+    headSize = 300;
+    headMarginBottom = "-60px";
+    calculatorPadding = "100px 24px 24px";
+    screenMarginBottom = 20;
+    screenMinHeight = 100;
+    historyButtonMarginBottom = 16;
+    buttonsGap = 12;
+    buttonMinHeight = 60;
+    buttonFontSize = 24;
+    buttonPadding = "20px 12px";
+    themeButtonPadding = "8px 10px";
+    themeButtonFontSize = 16;
+  }
+  // ==================================================================
+
   useEffect(() => {
     const stored = localStorage.getItem("chihuahua-history");
     if (stored) setHistory(JSON.parse(stored));
@@ -30,12 +101,10 @@ function App() {
     if (theme === "dark") setDark(true);
   }, []);
 
-  // Sauvegarder l'historique
   useEffect(() => {
     localStorage.setItem("chihuahua-history", JSON.stringify(history));
   }, [history]);
 
-  // Gérer le thème
   useEffect(() => {
     document.body.classList.toggle("dark-theme", dark);
     localStorage.setItem("chihuahua-theme", dark ? "dark" : "light");
@@ -59,7 +128,6 @@ function App() {
   const handleEqual = () => {
     if (!input.trim()) return;
     try {
-      // eslint-disable-next-line no-eval
       const res = eval(input);
       setResult(res.toString());
       setHistory((prev) => {
@@ -86,35 +154,36 @@ function App() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: justifyContent,
         position: "relative",
-        padding: mobile ? "10px" : "20px",
+        padding: mainContainerPadding,
         boxSizing: "border-box",
       }}
     >
-      {/* Bouton thème en haut à droite, plus petit */}
       <button
         onClick={() => setDark((d) => !d)}
         style={{
           position: "fixed",
-          right: mobile ? 12 : 16,
-          top: mobile ? 12 : 16,
+          right: isSmall ? 12 : 16,
+          top: isSmall ? 12 : 16,
           zIndex: 100,
           background: dark ? "#3d3d3d" : "#ffe5b4",
           color: dark ? "#ffe5b4" : "#7b4a00",
           border: `2px solid ${borderColor}`,
           borderRadius: 50,
-          padding: mobile ? "6px 8px" : "8px 10px",
+          padding: themeButtonPadding,
           fontWeight: "bold",
           cursor: "pointer",
-          boxShadow: `0 3px 10px ${dark ? "rgba(0,0,0,0.4)" : "rgba(139, 90, 43, 0.2)"}`,
-          fontSize: mobile ? 14 : 16,
+          boxShadow: `0 3px 10px ${
+            dark ? "rgba(0,0,0,0.4)" : "rgba(139, 90, 43, 0.2)"
+          }`,
+          fontSize: themeButtonFontSize,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           transition: "all 0.3s ease",
-          minWidth: mobile ? 32 : 36,
-          minHeight: mobile ? 32 : 36,
+          minWidth: isSmall ? 32 : 36,
+          minHeight: isSmall ? 32 : 36,
         }}
         onMouseEnter={(e) => {
           (e.target as HTMLButtonElement).style.transform = "scale(1.1)";
@@ -127,7 +196,6 @@ function App() {
         {dark ? "☀️" : "🌙"}
       </button>
 
-      {/* Container principal */}
       <div
         className="calculator-container"
         style={{
@@ -142,56 +210,59 @@ function App() {
           position: "relative",
         }}
       >
-        {/* Tête du chihuahua - plus visible */}
         <div
           style={{
             position: "relative",
             width: "100%",
             display: "flex",
             justifyContent: "center",
-            marginBottom: "-60px", // Overlap avec la calculatrice
+            marginBottom: headMarginBottom,
             zIndex: 1,
           }}
         >
-          <ChihuahuaHead size={mobile ? 260 : 300} />
+          <ChihuahuaHead size={headSize} />
         </div>
 
-        {/* Calculatrice */}
         <div
           style={{
             background: cardBg,
             borderRadius: 24,
-            padding: mobile ? "80px 16px 20px" : "100px 24px 24px", // Padding top pour laisser place à la tête
+            padding: calculatorPadding,
             width: "100%",
             boxSizing: "border-box",
             border: `3px solid ${borderColor}`,
-            boxShadow: `0 10px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(139, 90, 43, 0.2)"}`,
+            boxShadow: `0 10px 30px ${
+              dark ? "rgba(0,0,0,0.5)" : "rgba(139, 90, 43, 0.2)"
+            }`,
             backdropFilter: "blur(10px)",
             position: "relative",
             zIndex: 2,
           }}
         >
-          {/* Écran de la calculatrice */}
           <div
             style={{
               width: "100%",
-              marginBottom: 20,
-              background: dark ? "rgba(20, 20, 20, 0.9)" : "rgba(255, 255, 255, 0.9)",
+              marginBottom: screenMarginBottom,
+              background: dark
+                ? "rgba(20, 20, 20, 0.9)"
+                : "rgba(255, 255, 255, 0.9)",
               borderRadius: 16,
               border: `2px solid ${borderColor}`,
-              padding: mobile ? "16px 12px" : "20px 16px",
+              padding: isSmall ? "12px" : "20px 16px",
               textAlign: "center",
-              minHeight: mobile ? 80 : 100,
+              minHeight: screenMinHeight,
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               gap: 8,
-              boxShadow: `inset 0 2px 8px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.1)"}`,
+              boxShadow: `inset 0 2px 8px ${
+                dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.1)"
+              }`,
             }}
           >
             <div
               style={{
-                fontSize: mobile ? 16 : 18,
+                fontSize: isSmall ? 16 : 18,
                 color: dark ? "#bbb" : "#666",
                 minHeight: 24,
                 wordBreak: "break-all",
@@ -201,10 +272,10 @@ function App() {
             </div>
             <div
               style={{
-                fontSize: mobile ? 24 : 32,
+                fontSize: isSmall ? 24 : 32,
                 color: result !== null ? "#2e7d32" : textColor,
                 fontWeight: "bold",
-                minHeight: mobile ? 28 : 36,
+                minHeight: isSmall ? 28 : 36,
                 wordBreak: "break-all",
               }}
             >
@@ -212,7 +283,6 @@ function App() {
             </div>
           </div>
 
-          {/* Bouton historique */}
           <button
             onClick={() => setShowHistory(true)}
             style={{
@@ -220,48 +290,43 @@ function App() {
               background: `linear-gradient(135deg, ${borderColor} 0%, #d4a574 100%)`,
               color: "#fff",
               fontWeight: "bold",
-              fontSize: mobile ? 16 : 18,
-              marginBottom: 16,
+              fontSize: isSmall ? 16 : 18,
+              marginBottom: historyButtonMarginBottom,
               border: "none",
               borderRadius: 16,
-              padding: mobile ? "12px" : "14px",
-              boxShadow: `0 4px 12px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.3)"}`,
+              padding: isSmall ? "12px" : "14px",
+              boxShadow: `0 4px 12px ${
+                dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.3)"
+              }`,
               cursor: "pointer",
               transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              (e.target as HTMLButtonElement).style.transform = "translateY(-2px)";
-              (e.target as HTMLButtonElement).style.boxShadow = `0 6px 16px ${dark ? "rgba(0,0,0,0.4)" : "rgba(139, 90, 43, 0.4)"}`;
-            }}
-            onMouseLeave={(e) => {
-              (e.target as HTMLButtonElement).style.transform = "translateY(0)";
-              (e.target as HTMLButtonElement).style.boxShadow = `0 4px 12px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.3)"}`;
             }}
           >
             📜 Voir l'historique
           </button>
 
-          {/* Grille des boutons */}
           <div
             className="calculator-buttons"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(4, 1fr)",
-              gap: mobile ? 8 : 12,
+              gap: buttonsGap,
               width: "100%",
             }}
           >
             {BUTTONS.map((btn) => {
-              const isOperator = ["=", "+", "-", "*", "/", "C", "⌫"].includes(btn);
+              const isOperator = ["=", "+", "-", "*", "/", "C", "⌫"].includes(
+                btn
+              );
               const isEquals = btn === "=";
-              
+
               return (
                 <button
                   key={btn}
                   onClick={() => handleClick(btn)}
                   style={{
-                    fontSize: mobile ? 20 : 24,
-                    padding: mobile ? "16px 8px" : "18px 12px",
+                    fontSize: buttonFontSize,
+                    padding: buttonPadding,
                     background: isEquals
                       ? `linear-gradient(135deg, #2e7d32 0%, #4caf50 100%)`
                       : isOperator
@@ -269,34 +334,22 @@ function App() {
                       : dark
                       ? "linear-gradient(135deg, #3d3d3d 0%, #2d2d2d 100%)"
                       : "linear-gradient(135deg, #fff 0%, #f5f5f5 100%)",
-                    color: isEquals || isOperator
-                      ? "#fff"
-                      : textColor,
-                    border: `2px solid ${isEquals ? "#2e7d32" : borderColor}`,
+                    color: isEquals || isOperator ? "#fff" : textColor,
+                    border: `2px solid ${
+                      isEquals ? "#2e7d32" : borderColor
+                    }`,
                     borderRadius: 12,
-                    boxShadow: `0 3px 8px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.2)"}`,
+                    boxShadow: `0 3px 8px ${
+                      dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.2)"
+                    }`,
                     transition: "all 0.15s ease",
                     fontWeight: isOperator ? "bold" : "500",
                     gridColumn: isEquals ? "span 4" : undefined,
                     cursor: "pointer",
-                    minHeight: mobile ? 50 : 55,
+                    minHeight: buttonMinHeight,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.target as HTMLButtonElement).style.transform = "translateY(-1px)";
-                    (e.target as HTMLButtonElement).style.boxShadow = `0 5px 12px ${dark ? "rgba(0,0,0,0.4)" : "rgba(139, 90, 43, 0.3)"}`;
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.target as HTMLButtonElement).style.transform = "translateY(0)";
-                    (e.target as HTMLButtonElement).style.boxShadow = `0 3px 8px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.2)"}`;
-                  }}
-                  onMouseDown={(e) => {
-                    (e.target as HTMLButtonElement).style.transform = "translateY(1px)";
-                  }}
-                  onMouseUp={(e) => {
-                    (e.target as HTMLButtonElement).style.transform = "translateY(-1px)";
                   }}
                 >
                   {btn}
@@ -307,7 +360,6 @@ function App() {
         </div>
       </div>
 
-      {/* Modal historique */}
       <Modal open={showHistory} onClose={() => setShowHistory(false)}>
         <History history={history} />
       </Modal>
