@@ -1,61 +1,119 @@
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0;
   text-align: center;
   width: 100%;
 }
 
-@media (max-width: 700px) {
-  .main-flex {
-    flex-direction: column !important;
-    gap: 8px !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  .calculator-container {
-    max-width: 98vw !important;
-    min-width: 0 !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-  }
-  .history-container {
-    min-width: unset !important;
-    max-width: 95vw !important;
-    width: 100% !important;
-    margin-top: 8px !important;
-    margin-left: 0 !important;
-    max-height: 120px !important;
-    overflow-y: auto !important;
-  }
-  
+/* Container principal de la calculatrice */
+.calculator-container {
+  max-width: 380px;
+  width: 100%;
+  margin: 0 auto;
 }
 
-@media (max-width: 400px) {
+/* Container de l'historique */
+.history-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Grille des boutons */
+.calculator-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+/* Responsive design pour mobile */
+@media (max-width: 700px) {
   .calculator-container {
     max-width: 98vw !important;
-    min-width: 0 !important;
     padding: 0 !important;
-    margin: 0 auto !important;
   }
+  
   .history-container {
-    max-width: 96vw !important;
-    padding: 6px !important;
+    max-width: 95vw !important;
+    padding: 12px !important;
     font-size: 0.9em !important;
   }
-  .chihuahua-head {
-    width: 90px !important;
-    max-width: 90px !important;
-    margin-bottom: 4px !important;
+  
+  .calculator-buttons {
+    gap: 8px !important;
   }
+  
   .calculator-buttons button {
-    font-size: 1.1em !important;
-    padding: 8px 0 !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
+    font-size: 18px !important;
+    padding: 14px 6px !important;
+    min-height: 50px !important;
   }
+}
+
+/* Responsive pour très petits écrans */
+@media (max-width: 400px) {
+  .calculator-container {
+    max-width: 95vw !important;
+    padding: 0 8px !important;
+  }
+  
+  .history-container {
+    max-width: 90vw !important;
+    padding: 10px !important;
+    font-size: 0.85em !important;
+  }
+  
+  .calculator-buttons {
+    gap: 6px !important;
+  }
+  
+  .calculator-buttons button {
+    font-size: 16px !important;
+    padding: 12px 4px !important;
+    min-height: 45px !important;
+  }
+}
+
+/* Animations et transitions */
+.calculator-buttons button {
+  transition: all 0.15s ease;
+}
+
+.calculator-buttons button:hover {
+  transform: translateY(-1px);
+}
+
+.calculator-buttons button:active {
+  transform: translateY(1px);
+}
+
+/* Scrollbar personnalisée pour l'historique */
+.history-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.history-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+  background: #e0b97a;
+  border-radius: 3px;
+}
+
+.history-container::-webkit-scrollbar-thumb:hover {
+  background: #d4a574;
+}
+
+/* Focus et accessibilité */
+button:focus-visible {
+  outline: 3px solid #e0b97a;
+  outline-offset: 2px;
+}
+
+/* Transitions fluides pour le thème */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }

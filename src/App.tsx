@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import History from "./History";
 import ChihuahuaHead from "./ChihuahuaHead";
@@ -22,7 +22,7 @@ function App() {
   const [showHistory, setShowHistory] = useState(false);
   const mobile = isMobile();
 
-  // Charger l'historique depuis le localStorage au démarrage
+  // Charger les données depuis le localStorage
   useEffect(() => {
     const stored = localStorage.getItem("chihuahua-history");
     if (stored) setHistory(JSON.parse(stored));
@@ -30,12 +30,12 @@ function App() {
     if (theme === "dark") setDark(true);
   }, []);
 
-  // Sauvegarder l'historique à chaque modification
+  // Sauvegarder l'historique
   useEffect(() => {
     localStorage.setItem("chihuahua-history", JSON.stringify(history));
   }, [history]);
 
-  // Sauvegarder le thème
+  // Gérer le thème
   useEffect(() => {
     document.body.classList.toggle("dark-theme", dark);
     localStorage.setItem("chihuahua-theme", dark ? "dark" : "light");
@@ -57,14 +57,14 @@ function App() {
   };
 
   const handleEqual = () => {
-    if (!input) return;
+    if (!input.trim()) return;
     try {
       // eslint-disable-next-line no-eval
       const res = eval(input);
-      setResult(res);
+      setResult(res.toString());
       setHistory((prev) => {
         const newHistory = [`${input} = ${res}`, ...prev];
-        return newHistory.slice(0, 10);
+        return newHistory.slice(0, 15);
       });
       setInput("");
     } catch {
@@ -72,206 +72,242 @@ function App() {
     }
   };
 
+  const containerBg = dark ? "#1a1a1a" : "#fffbe6";
+  const cardBg = dark ? "rgba(50, 50, 50, 0.95)" : "rgba(255, 251, 230, 0.95)";
+  const textColor = dark ? "#ffe5b4" : "#7b4a00";
+  const borderColor = dark ? "#8b5a2b" : "#e0b97a";
+
   return (
     <div
       style={{
         minHeight: "100vh",
         width: "100%",
-        maxHeight: "100vh",
-        overflow: "auto",
-        background: dark ? "#222" : "#fffbe6",
+        background: `linear-gradient(135deg, ${containerBg} 0%, ${dark ? "#2d2d2d" : "#f5e6d3"} 100%)`,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-        padding: 0,
+        padding: mobile ? "10px" : "20px",
         boxSizing: "border-box",
       }}
     >
-      {/* Bouton thème */}
+      {/* Bouton thème en haut à droite, plus petit */}
       <button
         onClick={() => setDark((d) => !d)}
         style={{
           position: "fixed",
-          right: 16,
-          top: 16,
+          right: mobile ? 12 : 16,
+          top: mobile ? 12 : 16,
           zIndex: 100,
-          background: dark ? "#222" : "#ffe5b4",
-          color: dark ? "#ffe5b4" : "#222",
-          border: "2px solid #fff",
-          borderRadius: 24,
-          padding: "8px 18px",
+          background: dark ? "#3d3d3d" : "#ffe5b4",
+          color: dark ? "#ffe5b4" : "#7b4a00",
+          border: `2px solid ${borderColor}`,
+          borderRadius: 50,
+          padding: mobile ? "6px 8px" : "8px 10px",
           fontWeight: "bold",
           cursor: "pointer",
-          boxShadow: "0 2px 6px #0002",
-          fontSize: 22,
+          boxShadow: `0 3px 10px ${dark ? "rgba(0,0,0,0.4)" : "rgba(139, 90, 43, 0.2)"}`,
+          fontSize: mobile ? 14 : 16,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          transition: "all 0.3s ease",
+          minWidth: mobile ? 32 : 36,
+          minHeight: mobile ? 32 : 36,
+        }}
+        onMouseEnter={(e) => {
+          (e.target as HTMLButtonElement).style.transform = "scale(1.1)";
+        }}
+        onMouseLeave={(e) => {
+          (e.target as HTMLButtonElement).style.transform = "scale(1)";
         }}
         aria-label="Changer de thème"
       >
         {dark ? "☀️" : "🌙"}
       </button>
 
-      {/* Calculatrice */}
+      {/* Container principal */}
       <div
         className="calculator-container"
         style={{
           background: "transparent",
-          border: "none",
-          boxShadow: "none",
           padding: 0,
           width: "100%",
-          maxWidth: 350,
+          maxWidth: 380,
           margin: "0 auto",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           position: "relative",
-          overflow: "hidden",
-          minHeight: 480, // pour laisser la place à la tête
         }}
       >
-        {/* Tête du chihuahua en fond */}
+        {/* Tête du chihuahua - plus visible */}
         <div
           style={{
-            position: "absolute",
-            top: "-40px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "110%",
-            zIndex: 0,
-            opacity: 0.25, // augmente l'opacité pour mieux voir la tête
-            pointerEvents: "none",
-            userSelect: "none",
+            position: "relative",
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "-60px", // Overlap avec la calculatrice
+            zIndex: 1,
           }}
-          aria-hidden="true"
         >
-          <ChihuahuaHead size={340} />
+          <ChihuahuaHead size={mobile ? 260 : 300} />
         </div>
-        <div style={{ width: "100%", zIndex: 1, position: "relative" }}>
-          {/* Cadran aligné */}
+
+        {/* Calculatrice */}
+        <div
+          style={{
+            background: cardBg,
+            borderRadius: 24,
+            padding: mobile ? "80px 16px 20px" : "100px 24px 24px", // Padding top pour laisser place à la tête
+            width: "100%",
+            boxSizing: "border-box",
+            border: `3px solid ${borderColor}`,
+            boxShadow: `0 10px 30px ${dark ? "rgba(0,0,0,0.5)" : "rgba(139, 90, 43, 0.2)"}`,
+            backdropFilter: "blur(10px)",
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
+          {/* Écran de la calculatrice */}
           <div
             style={{
               width: "100%",
-              marginBottom: 8,
-              background: dark
-                ? "rgba(34,34,34,0.75)" // plus transparent pour voir la tête
-                : "rgba(255,251,230,0.85)", // plus transparent pour voir la tête
+              marginBottom: 20,
+              background: dark ? "rgba(20, 20, 20, 0.9)" : "rgba(255, 255, 255, 0.9)",
               borderRadius: 16,
-              boxShadow: "0 2px 8px #0002",
-              border: "2px solid #e0b97a", // bordure dorée pour délimiter
-              padding: 12,
+              border: `2px solid ${borderColor}`,
+              padding: mobile ? "16px 12px" : "20px 16px",
               textAlign: "center",
-              position: "relative",
-              zIndex: 1,
+              minHeight: mobile ? 80 : 100,
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              alignItems: "center",
-              minHeight: 80,
+              gap: 8,
+              boxShadow: `inset 0 2px 8px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.1)"}`,
             }}
           >
             <div
               style={{
-                fontSize: 18,
+                fontSize: mobile ? 16 : 18,
+                color: dark ? "#bbb" : "#666",
                 minHeight: 24,
-                color: dark ? "#ffe5b4" : "#7b4a00", // texte plus foncé pour contraster
-                width: "100%",
-                textAlign: "center",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                wordBreak: "break-all",
               }}
             >
               {input || "0"}
             </div>
             <div
               style={{
-                fontSize: 28,
-                minHeight: 32,
-                color: result !== null ? "#388e3c" : (dark ? "#ffe5b4" : "#7b4a00"),
+                fontSize: mobile ? 24 : 32,
+                color: result !== null ? "#2e7d32" : textColor,
                 fontWeight: "bold",
-                marginBottom: 0,
-                width: "100%",
-                textAlign: "center",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                minHeight: mobile ? 28 : 36,
+                wordBreak: "break-all",
               }}
             >
               {result !== null ? result : ""}
             </div>
           </div>
 
-          {/* Pavé de touches aligné */}
+          {/* Bouton historique */}
+          <button
+            onClick={() => setShowHistory(true)}
+            style={{
+              width: "100%",
+              background: `linear-gradient(135deg, ${borderColor} 0%, #d4a574 100%)`,
+              color: "#fff",
+              fontWeight: "bold",
+              fontSize: mobile ? 16 : 18,
+              marginBottom: 16,
+              border: "none",
+              borderRadius: 16,
+              padding: mobile ? "12px" : "14px",
+              boxShadow: `0 4px 12px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.3)"}`,
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              (e.target as HTMLButtonElement).style.transform = "translateY(-2px)";
+              (e.target as HTMLButtonElement).style.boxShadow = `0 6px 16px ${dark ? "rgba(0,0,0,0.4)" : "rgba(139, 90, 43, 0.4)"}`;
+            }}
+            onMouseLeave={(e) => {
+              (e.target as HTMLButtonElement).style.transform = "translateY(0)";
+              (e.target as HTMLButtonElement).style.boxShadow = `0 4px 12px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.3)"}`;
+            }}
+          >
+            📜 Voir l'historique
+          </button>
+
+          {/* Grille des boutons */}
           <div
             className="calculator-buttons"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(4, 1fr)",
-              gap: 4,
+              gap: mobile ? 8 : 12,
               width: "100%",
-              position: "relative",
-              zIndex: 1,
             }}
           >
-            {/* Bouton historique */}
-            <button
-              onClick={() => setShowHistory(true)}
-              style={{
-                gridColumn: "span 4",
-                background: "#e0b97a",
-                color: "#222",
-                fontWeight: "bold",
-                fontSize: 18,
-                marginBottom: 8,
-                border: "none",
-                borderRadius: 12,
-                padding: "10px 0",
-                boxShadow: "0 2px 6px #0002",
-                cursor: "pointer",
-              }}
-            >
-              📜 Historique
-            </button>
-            {BUTTONS.map((btn) => (
-              <button
-                key={btn}
-                onClick={() => handleClick(btn)}
-                style={{
-                  fontSize: mobile ? 28 : 20,
-                  padding: mobile ? 18 : 12,
-                  background: btn === "="
-                    ? "#e0b97a"
-                    : dark
-                      ? "rgba(68, 68, 68, 0.15)"
-                      : "rgba(255, 229, 180, 0.92)", // plus opaque, plus lisible
-                  color: btn === "="
-                    ? "#222"
-                    : dark
-                    ? "#ffe5b4"
-                    : "#7b4a00",
-                  border: "1.5px solid #e0b97a",
-                  borderRadius: 12,
-                  margin: 2,
-                  boxShadow: "0 2px 6px #e0b97a",
-                  transition: "background 0.2s",
-                  fontWeight: btn === "=" ? "bold" : "normal",
-                  gridColumn: btn === "=" ? "span 4" : undefined,
-                  backdropFilter: btn === "=" ? undefined : "blur(2px)",
-                  zIndex: 1,
-                }}
-              >
-                {btn}
-              </button>
-            ))}
+            {BUTTONS.map((btn) => {
+              const isOperator = ["=", "+", "-", "*", "/", "C", "⌫"].includes(btn);
+              const isEquals = btn === "=";
+              
+              return (
+                <button
+                  key={btn}
+                  onClick={() => handleClick(btn)}
+                  style={{
+                    fontSize: mobile ? 20 : 24,
+                    padding: mobile ? "16px 8px" : "18px 12px",
+                    background: isEquals
+                      ? `linear-gradient(135deg, #2e7d32 0%, #4caf50 100%)`
+                      : isOperator
+                      ? `linear-gradient(135deg, ${borderColor} 0%, #c19660 100%)`
+                      : dark
+                      ? "linear-gradient(135deg, #3d3d3d 0%, #2d2d2d 100%)"
+                      : "linear-gradient(135deg, #fff 0%, #f5f5f5 100%)",
+                    color: isEquals || isOperator
+                      ? "#fff"
+                      : textColor,
+                    border: `2px solid ${isEquals ? "#2e7d32" : borderColor}`,
+                    borderRadius: 12,
+                    boxShadow: `0 3px 8px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.2)"}`,
+                    transition: "all 0.15s ease",
+                    fontWeight: isOperator ? "bold" : "500",
+                    gridColumn: isEquals ? "span 4" : undefined,
+                    cursor: "pointer",
+                    minHeight: mobile ? 50 : 55,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.target as HTMLButtonElement).style.transform = "translateY(-1px)";
+                    (e.target as HTMLButtonElement).style.boxShadow = `0 5px 12px ${dark ? "rgba(0,0,0,0.4)" : "rgba(139, 90, 43, 0.3)"}`;
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.target as HTMLButtonElement).style.transform = "translateY(0)";
+                    (e.target as HTMLButtonElement).style.boxShadow = `0 3px 8px ${dark ? "rgba(0,0,0,0.3)" : "rgba(139, 90, 43, 0.2)"}`;
+                  }}
+                  onMouseDown={(e) => {
+                    (e.target as HTMLButtonElement).style.transform = "translateY(1px)";
+                  }}
+                  onMouseUp={(e) => {
+                    (e.target as HTMLButtonElement).style.transform = "translateY(-1px)";
+                  }}
+                >
+                  {btn}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
-      {/* Modale historique */}
+
+      {/* Modal historique */}
       <Modal open={showHistory} onClose={() => setShowHistory(false)}>
         <History history={history} />
       </Modal>
@@ -280,4 +316,3 @@ function App() {
 }
 
 export default App;
-

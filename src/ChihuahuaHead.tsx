@@ -1,15 +1,16 @@
 import React from "react";
 
-const ChihuahuaHead: React.FC<{ size?: number; className?: string }> = ({ size = 120, className }) => (
+const ChihuahuaHead: React.FC<{ size?: number; className?: string }> = ({ 
+  size = 280, 
+  className 
+}) => (
   <div
     className={className}
     style={{
       position: "relative",
       width: size,
       maxWidth: size,
-      minWidth: 60,
       margin: "0 auto",
-      marginBottom: 8,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -21,7 +22,6 @@ const ChihuahuaHead: React.FC<{ size?: number; className?: string }> = ({ size =
       height={size * 0.8}
       style={{
         maxWidth: size,
-        minWidth: 100,
         pointerEvents: "none",
       }}
     >
@@ -29,73 +29,90 @@ const ChihuahuaHead: React.FC<{ size?: number; className?: string }> = ({ size =
       <path
         d="M60,90 Q-10,10 80,40 Q100,70 60,90"
         fill="#eac086"
-        stroke="#b48a4a"
-        strokeWidth="4"
+        stroke="#8b5a2b"
+        strokeWidth="3"
       />
       {/* Oreille droite */}
       <path
         d="M260,90 Q330,10 240,40 Q220,70 260,90"
         fill="#eac086"
-        stroke="#b48a4a"
-        strokeWidth="4"
+        stroke="#8b5a2b"
+        strokeWidth="3"
       />
-      {/* Tête */}
+      {/* Tête principale */}
       <ellipse
         cx="160"
         cy="140"
         rx="100"
         ry="90"
         fill="#ffe5b4"
-        stroke="#b48a4a"
-        strokeWidth="4"
+        stroke="#8b5a2b"
+        strokeWidth="3"
       />
       {/* Joues */}
       <ellipse cx="90" cy="170" rx="25" ry="18" fill="#f9d98a" />
       <ellipse cx="230" cy="170" rx="25" ry="18" fill="#f9d98a" />
       {/* Yeux */}
-      <ellipse cx="120" cy="140" rx="12" ry="16" fill="#fff" />
-      <ellipse cx="200" cy="140" rx="12" ry="16" fill="#fff" />
-      <ellipse cx="120" cy="145" rx="5" ry="8" fill="#4d2c0c" />
-      <ellipse cx="200" cy="145" rx="5" ry="8" fill="#4d2c0c" />
+      <ellipse cx="120" cy="130" rx="15" ry="20" fill="#fff" />
+      <ellipse cx="200" cy="130" rx="15" ry="20" fill="#fff" />
+      <ellipse cx="120" cy="135" rx="8" ry="12" fill="#2d1810" />
+      <ellipse cx="200" cy="135" rx="8" ry="12" fill="#2d1810" />
+      {/* Reflets dans les yeux */}
+      <ellipse cx="123" cy="130" rx="3" ry="4" fill="#fff" />
+      <ellipse cx="203" cy="130" rx="3" ry="4" fill="#fff" />
       {/* Truffe */}
-      <ellipse cx="160" cy="175" rx="12" ry="8" fill="#4d2c0c" />
+      <ellipse cx="160" cy="175" rx="12" ry="8" fill="#2d1810" />
+      <ellipse cx="160" cy="173" rx="4" ry="3" fill="#fff" opacity="0.3" />
       {/* Museau */}
       <path
         d="M160,183 Q150,195 140,190"
-        stroke="#4d2c0c"
-        strokeWidth="3"
+        stroke="#2d1810"
+        strokeWidth="2"
         fill="none"
       />
       <path
         d="M160,183 Q170,195 180,190"
-        stroke="#4d2c0c"
+        stroke="#2d1810"
+        strokeWidth="2"
+        fill="none"
+      />
+      {/* Sourcils expressifs */}
+      <path
+        d="M105,115 Q120,108 135,115"
+        stroke="#8b5a2b"
         strokeWidth="3"
         fill="none"
       />
-      {/* Sourcils */}
       <path
-        d="M110,125 Q120,120 130,125"
-        stroke="#b48a4a"
+        d="M185,115 Q200,108 215,115"
+        stroke="#8b5a2b"
+        strokeWidth="3"
+        fill="none"
+      />
+      {/* Poils sur les oreilles */}
+      <path
+        d="M40,60 Q30,45 55,55"
+        stroke="#8b5a2b"
         strokeWidth="2"
         fill="none"
       />
       <path
-        d="M190,125 Q200,120 210,125"
-        stroke="#b48a4a"
+        d="M280,60 Q290,45 265,55"
+        stroke="#8b5a2b"
         strokeWidth="2"
         fill="none"
       />
-      {/* Poils oreilles */}
+      {/* Petits poils décoratifs */}
       <path
-        d="M40,60 Q30,50 60,55"
-        stroke="#b48a4a"
-        strokeWidth="2"
+        d="M75,100 Q70,95 80,98"
+        stroke="#8b5a2b"
+        strokeWidth="1"
         fill="none"
       />
       <path
-        d="M280,60 Q290,50 260,55"
-        stroke="#b48a4a"
-        strokeWidth="2"
+        d="M245,100 Q250,95 240,98"
+        stroke="#8b5a2b"
+        strokeWidth="1"
         fill="none"
       />
     </svg>
