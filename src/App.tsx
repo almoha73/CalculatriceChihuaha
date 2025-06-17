@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import History from "./History";
 import ChihuahuaHead from "./ChihuahuaHead";
 import Modal from "./Modal";
@@ -42,27 +42,59 @@ function App() {
       localStorage.setItem("theme", "light");
     }
   }, [dark]);
-  
-  const handleClick = (value: string) => {
+
+  const processKeyPress = useCallback((value: string) => {
     if (value === "C") { setInput(""); setResult(null); }
     else if (value === "⌫") { setInput((prev) => prev.slice(0, -1)); }
-    else if (value === "=") { handleEqual(); }
+    else if (value === "=") {
+      setInput(currentInput => {
+        if (!currentInput.trim()) return currentInput;
+        try {
+          // Attention: l'utilisation de eval() peut être dangereuse avec des entrées non fiables.
+          // Pour une calculatrice de production, une bibliothèque d'analyse et d'évaluation serait préférable.
+          const res = eval(currentInput);
+          setResult(res.toString());
+          setHistory((prevHistory) => [`${currentInput} = ${res}`, ...prevHistory].slice(0, 15));
+          return ""; // Vide l'input après le calcul
+        } catch {
+          setResult("Erreur");
+          return currentInput; // Conserve l'input en cas d'erreur
+        }
+      });
+    }
     else if (value === "%") { setInput((prev) => prev + "/100"); }
     else { setInput((prev) => prev + value); }
-  };
+  }, [setInput, setResult, setHistory]); // setInput, setResult, setHistory sont stables
 
-  const handleEqual = () => {
-    if (!input.trim()) return;
-    try {
-      const res = eval(input);
-      setResult(res.toString());
-      setHistory((prev) => [`${input} = ${res}`, ...prev].slice(0, 15));
-      setInput("");
-    } catch { setResult("Erreur"); }
-  };
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const { key, shiftKey, ctrlKey, metaKey, altKey } = event;
+      let calculatorAction: string | null = null;
+
+      if (key >= "0" && key <= "9" && !shiftKey && !ctrlKey && !metaKey && !altKey) calculatorAction = key;
+      else if ((key === "." || key === ",") && !shiftKey && !ctrlKey && !metaKey && !altKey) calculatorAction = ".";
+      else if (key === "/" && !shiftKey && !ctrlKey && !metaKey && !altKey) { calculatorAction = "/"; event.preventDefault(); }
+      else if (key === "-" && !shiftKey && !ctrlKey && !metaKey && !altKey) calculatorAction = "-";
+      else if ((key === "+" || (shiftKey && key === "=")) && !ctrlKey && !metaKey && !altKey) { calculatorAction = "+"; event.preventDefault(); }
+      else if ((key === "*" || (shiftKey && key === "8")) && !ctrlKey && !metaKey && !altKey) { calculatorAction = "*"; event.preventDefault(); }
+      else if ((key === "%" || (shiftKey && key === "5")) && !ctrlKey && !metaKey && !altKey) calculatorAction = "%";
+      else if ((key === "(" || (shiftKey && key === "9")) && !ctrlKey && !metaKey && !altKey) calculatorAction = "(";
+      else if ((key === ")" || (shiftKey && key === "0")) && !ctrlKey && !metaKey && !altKey) calculatorAction = ")";
+      else if ((key === "=" || key === "Enter") && !ctrlKey && !metaKey && !altKey) { calculatorAction = "="; event.preventDefault(); }
+      else if (key === "Backspace" && !ctrlKey && !metaKey && !altKey) { calculatorAction = "⌫"; event.preventDefault(); }
+      else if (key === "Escape" && !ctrlKey && !metaKey && !altKey) calculatorAction = "C";
+      else if (key.toLowerCase() === "c" && !shiftKey && !ctrlKey && !metaKey && !altKey) calculatorAction = "C";
+
+      if (calculatorAction && BUTTONS.includes(calculatorAction)) {
+        processKeyPress(calculatorAction);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [processKeyPress]);
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-zinc-100 to-zinc-200 p-4 dark:from-neutral-900 dark:to-black">
+    <main className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-stone-200 to-stone-400 p-4 dark:from-neutral-900 dark:to-black">
       <button
         onClick={() => setDark(!dark)}
         className="fixed top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-200/50 text-xl text-zinc-800 backdrop-blur-sm transition hover:scale-110 dark:bg-neutral-800/50 dark:text-orange-300 md:h-12 md:w-12"
@@ -77,10 +109,10 @@ function App() {
           <ChihuahuaHead className="absolute bottom-0 left-1/2 w-48 -translate-x-1/2 md:w-60 lg:w-64" />
         </div>
 
-        <div className="relative w-full rounded-3xl border-2 border-orange-800/20 bg-zinc-50/80 p-3 shadow-2xl backdrop-blur-lg dark:border-orange-600/20 dark:bg-neutral-800/80 md:p-4">
+        <div className="relative w-full rounded-3xl border-2 border-orange-800/20 bg-orange-50/80 p-3 shadow-2xl backdrop-blur-lg dark:border-orange-600/20 dark:bg-neutral-800/80 md:p-4">
           
-          <div className="mb-3 min-h-[90px] rounded-xl border border-orange-800/10 bg-zinc-100/70 p-3 text-right dark:border-orange-600/20 dark:bg-black/20 md:min-h-[100px] lg:p-4">
-            <div className="min-h-[24px] text-base text-zinc-500 dark:text-zinc-400 break-all md:text-lg lg:text-xl">{input || "0"}</div>
+          <div className="mb-3 min-h-[90px] rounded-xl border border-orange-800/10 bg-orange-100/70 p-3 text-right dark:border-orange-600/20 dark:bg-black/20 md:min-h-[100px] lg:p-4">
+            <div className="min-h-[28px] font-bold text-lg text-zinc-500 dark:text-zinc-400 break-all md:text-xl lg:text-2xl">{input || "0"}</div>
             <div className="min-h-[36px] text-3xl font-bold text-orange-900 dark:text-orange-200 break-all md:text-4xl">
               {result !== null ? result : ""}
             </div>
@@ -107,9 +139,9 @@ function App() {
               const equalsClasses = `col-span-4 border-orange-950 bg-orange-900 text-orange-100 hover:bg-orange-800`;
               
               const btnClasses = `${baseClasses} ${isEquals ? equalsClasses : isOperator ? operatorClasses : isControl ? controlClasses : numberClasses}`;
-              
+
               return (
-                <button key={btn} onClick={() => handleClick(btn)} className={btnClasses}>
+                <button key={btn} onClick={() => processKeyPress(btn)} className={btnClasses}>
                   {btn}
                 </button>
               );
