@@ -1,7 +1,6 @@
-/* On importe les styles de base de Tailwind */
 @import "tailwindcss";
 
-
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* Styles de base pour le body */
 body {
