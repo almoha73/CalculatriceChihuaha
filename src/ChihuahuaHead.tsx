@@ -1,8 +1,8 @@
 import React from "react";
 
 // Ce composant "simple" accepte des classes Tailwind pour être stylisé par son parent.
-const ChihuahuaHead: React.FC<{ className?: string }> = ({ className }) => (
-  <div className={className}>
+const ChihuahuaHead: React.FC<{ className?: string; "aria-hidden"?: boolean }> = ({ className, ...props }) => (
+  <div className={className} {...props}>
     <svg
       viewBox="0 0 320 260"
       className="h-full w-full" // Le SVG remplira son conteneur

@@ -150,7 +150,7 @@ function App() {
         </div>
       </div>
 
-      <Modal open={showHistory} onClose={() => setShowHistory(false)}>
+      <Modal open={showHistory} onClose={() => setShowHistory(false)} titleId="history-title">
         <History history={history} />
       </Modal>
     </main>
