@@ -11,18 +11,18 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, children, titleId }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusElement = useRef<HTMLElement | null>(null);
 
-  // Sélecteur pour les éléments focusables
-  const FOCUSABLE_ELEMENTS_SELECTOR = [
-    'a[href]:not([tabindex="-1"])',
-    'button:not([disabled]):not([tabindex="-1"])',
-    'input:not([disabled]):not([tabindex="-1"])',
-    'select:not([disabled]):not([tabindex="-1"])',
-    'textarea:not([disabled]):not([tabindex="-1"])',
-    '[tabindex]:not([tabindex="-1"])',
-  ].join(', ');
-
   useEffect(() => {
     if (open) {
+      // Sélecteur pour les éléments focusables (déplacé à l'intérieur de l'effet)
+      const FOCUSABLE_ELEMENTS_SELECTOR = [
+        'a[href]:not([tabindex="-1"])',
+        'button:not([disabled]):not([tabindex="-1"])',
+        'input:not([disabled]):not([tabindex="-1"])',
+        'select:not([disabled]):not([tabindex="-1"])',
+        'textarea:not([disabled]):not([tabindex="-1"])',
+        '[tabindex]:not([tabindex="-1"])',
+      ].join(', ');
+
       previousFocusElement.current = document.activeElement as HTMLElement;
 
       const modalElement = modalRef.current;
