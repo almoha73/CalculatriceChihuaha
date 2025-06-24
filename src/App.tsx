@@ -102,75 +102,75 @@ function App() {
       const { key, shiftKey, ctrlKey, metaKey, altKey, code } = event;
       let calculatorAction: string | null = null;
 
-      // Priorité au caractère réel (key) plutôt qu'au code de la touche
-      // Cela gère automatiquement les différents layouts de clavier
+      // === GESTION SPÉCIFIQUE AZERTY FRANÇAIS ===
       
-      // Chiffres
-      if (key >= "0" && key <= "9" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = key;
-        event.preventDefault();
+      // Chiffres sur la rangée principale (AZERTY nécessite Shift pour les chiffres)
+      if (shiftKey && !ctrlKey && !metaKey && !altKey) {
+        // Chiffres avec Shift sur AZERTY
+        if (key === "1" || key === "&") calculatorAction = "1";
+        else if (key === "2" || key === "é") calculatorAction = "2";
+        else if (key === "3" || key === '"') calculatorAction = "3";
+        else if (key === "4" || key === "'") calculatorAction = "4";
+        else if (key === "5" || key === "(") calculatorAction = "5";
+        else if (key === "6" || key === "-") calculatorAction = "6"; // AZERTY: Shift+6 = 6
+        else if (key === "7" || key === "è") calculatorAction = "7";
+        else if (key === "8" || key === "_") calculatorAction = "8";
+        else if (key === "9" || key === "ç") calculatorAction = "9";
+        else if (key === "0" || key === "à") calculatorAction = "0";
+        // Opérateurs avec Shift
+        else if (key === "*" || code === "Digit8") calculatorAction = "*"; // Shift+8 = *
+        else if (key === "+" || code === "Equal") calculatorAction = "+"; // Shift+= = +
+        else if (key === "%" || code === "Digit5") calculatorAction = "%"; // Shift+5 = %
+        else if (key === "(" || code === "Digit5") calculatorAction = "("; // Shift+5 peut aussi être (
+        else if (key === ")" || code === "Digit6") calculatorAction = ")"; // Shift+6 peut aussi être )
+        
+        if (calculatorAction) event.preventDefault();
       }
-      // Point décimal
-      else if ((key === "." || key === ",") && !shiftKey && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = ".";
-        event.preventDefault();
-      }
-      // Division
-      else if (key === "/" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "/";
-        event.preventDefault();
-      }
-      // Multiplication - support * et shift+8 sur AZERTY
-      else if ((key === "*" || (shiftKey && key === "8")) && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "*";
-        event.preventDefault();
-      }
-      // Tiret/Moins - PRIORITÉ au caractère key
-      else if (key === "-" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "-";
-        event.preventDefault();
-      }
-      // Addition - support + et shift+= sur QWERTY
-      else if ((key === "+" || (shiftKey && key === "=")) && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "+";
-        event.preventDefault();
-      }
-      // Parenthèses
-      else if ((key === "(" || (shiftKey && key === "9")) && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "(";
-        event.preventDefault();
-      }
-      else if ((key === ")" || (shiftKey && key === "0")) && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = ")";
-        event.preventDefault();
-      }
-      // Pourcentage
-      else if ((key === "%" || (shiftKey && key === "5")) && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "%";
-        event.preventDefault();
-      }
-      // Égal et Entrée
-      else if ((key === "=" || key === "Enter") && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "=";
-        event.preventDefault();
-      }
-      // Effacement
-      else if (key === "Backspace" && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "⌫";
-        event.preventDefault();
-      }
-      // Clear
-      else if (key === "Escape" && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "C";
-        event.preventDefault();
-      }
-      else if (key.toLowerCase() === "c" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "C";
-        event.preventDefault();
+      // Touches sans Shift
+      else if (!shiftKey && !ctrlKey && !metaKey && !altKey) {
+        // Symboles directement accessibles sur AZERTY
+        if (key === "-" || code === "Digit6") { // AZERTY: touche 6 sans Shift = -
+          calculatorAction = "-";
+          event.preventDefault();
+        }
+        else if (key === "=" || code === "Equal") {
+          calculatorAction = "=";
+          event.preventDefault();
+        }
+        else if (key === "/" || code === "Slash") {
+          calculatorAction = "/";
+          event.preventDefault();
+        }
+        else if (key === "." || key === "," || code === "Comma" || code === "Period") {
+          calculatorAction = ".";
+          event.preventDefault();
+        }
+        // Chiffres du pavé numérique (toujours disponibles)
+        else if (key >= "0" && key <= "9" && code.startsWith("Numpad")) {
+          calculatorAction = key;
+          event.preventDefault();
+        }
+        // Contrôles
+        else if (key === "Backspace") {
+          calculatorAction = "⌫";
+          event.preventDefault();
+        }
+        else if (key === "Escape") {
+          calculatorAction = "C";
+          event.preventDefault();
+        }
+        else if (key.toLowerCase() === "c") {
+          calculatorAction = "C";
+          event.preventDefault();
+        }
+        else if (key === "Enter") {
+          calculatorAction = "=";
+          event.preventDefault();
+        }
       }
       
-      // Support du pavé numérique
-      else if (code === "NumpadDivide") {
+      // === SUPPORT PAVÉ NUMÉRIQUE (universel) ===
+      if (code === "NumpadDivide") {
         calculatorAction = "/";
         event.preventDefault();
       }
@@ -199,7 +199,8 @@ function App() {
         event.preventDefault();
       }
 
-      if (calculatorAction) {
+      // Exécuter l'action si elle est valide
+      if (calculatorAction && BUTTONS.includes(calculatorAction)) {
         processKeyPress(calculatorAction);
       }
     };
