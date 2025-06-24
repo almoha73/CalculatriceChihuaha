@@ -281,7 +281,7 @@ function App() {
               const isOperator = ["%", "/", "*", "-", "+"].includes(btn);
               const isControl = ["C", "⌫", "(", ")"].includes(btn);
               const isEquals = btn === "=";
-              const isNumber = /^[0-9.]$/.test(btn);
+             // const isNumber = /^[0-9.]$/.test(btn);
 
               const baseClasses = "rounded-xl font-bold transition-all duration-150 active:scale-95 py-3 md:py-4 text-xl md:text-2xl shadow-lg hover:shadow-xl border-2 relative overflow-hidden group";
               
