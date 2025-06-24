@@ -163,9 +163,18 @@ function App() {
         calculatorAction = "*";
         event.preventDefault();
       }
-      else if (key === "-" || code === "NumpadSubtract" || code === "Minus") {
-        calculatorAction = "-";
-        event.preventDefault();
+      // Tiret/Moins - Support AZERTY (sous le 6) et QWERTY
+      else if (key === "-" || code === "NumpadSubtract" || code === "Minus" || code === "Digit6") {
+        // Sur AZERTY, le tiret est accessible directement sous le 6
+        // Sur QWERTY, il est sur la touche Minus
+        if (code === "Digit6" && !shiftKey) {
+          // AZERTY : tiret direct sous le 6
+          calculatorAction = "-";
+          event.preventDefault();
+        } else if (key === "-" || code === "NumpadSubtract" || code === "Minus") {
+          calculatorAction = "-";
+          event.preventDefault();
+        }
       }
       else if (key === "+" || code === "NumpadAdd" || code === "Equal") {
         calculatorAction = "+";
