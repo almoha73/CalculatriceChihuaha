@@ -47,57 +47,69 @@ function App() {
     }
     else if (value === "⌫") { 
       setInput((prev) => prev.slice(0, -1)); 
-      if (result) setResult(null);
+      setResult(null);
     }
     else if (value === "=") {
-      if (!input.trim()) return;
-      
-      setIsCalculating(true);
-      
-      // Petit délai pour l'animation
-      setTimeout(() => {
-        try {
-          const res = eval(input);
-          const resultString = res.toString();
-          setResult(resultString);
-          
-          // Ajouter à l'historique seulement une fois
-          const historyEntry = `${input} = ${resultString}`;
-          setHistory((prevHistory) => {
-            // Vérifier si cette entrée existe déjà pour éviter les doublons
-            if (prevHistory[0] === historyEntry) {
-              return prevHistory;
-            }
-            return [historyEntry, ...prevHistory].slice(0, 15);
-          });
-          
-          setIsCalculating(false);
-        } catch {
-          setResult("Erreur");
-          setIsCalculating(false);
-        }
-      }, 200);
+      setInput(currentInput => {
+        if (!currentInput.trim()) return currentInput;
+        
+        setIsCalculating(true);
+        
+        // Petit délai pour l'animation
+        setTimeout(() => {
+          try {
+            const res = eval(currentInput);
+            const resultString = res.toString();
+            setResult(resultString);
+            
+            // Ajouter à l'historique seulement une fois
+            const historyEntry = `${currentInput} = ${resultString}`;
+            setHistory((prevHistory) => {
+              // Vérifier si cette entrée existe déjà pour éviter les doublons
+              if (prevHistory[0] === historyEntry) {
+                return prevHistory;
+              }
+              return [historyEntry, ...prevHistory].slice(0, 15);
+            });
+            
+            setIsCalculating(false);
+          } catch {
+            setResult("Erreur");
+            setIsCalculating(false);
+          }
+        }, 200);
+        
+        return currentInput;
+      });
     }
     else if (value === "%") { 
       setInput((prev) => prev + "/100"); 
+      setResult(null);
     }
     else { 
       setInput((prev) => prev + value); 
-      if (result) setResult(null);
+      setResult(null);
     }
-  }, [input, result]);
+  }, []); // Pas de dépendances pour éviter les re-rendus
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignorer si on est dans un input ou textarea
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
       const { key, shiftKey, ctrlKey, metaKey, altKey } = event;
       let calculatorAction: string | null = null;
 
       // Empêcher les actions par défaut pour les touches de calculatrice
       if (key >= "0" && key <= "9" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = key;
+        event.preventDefault();
       }
       else if ((key === "." || key === ",") && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = ".";
+        event.preventDefault();
       }
       else if (key === "/" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = "/";
@@ -105,25 +117,53 @@ function App() {
       }
       else if (key === "-" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = "-";
+        event.preventDefault();
       }
-      else if ((key === "+" || (shiftKey && key === "=")) && !ctrlKey && !metaKey && !altKey) {
+      else if (key === "+" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = "+";
         event.preventDefault();
       }
-      else if ((key === "*" || (shiftKey && key === "8")) && !ctrlKey && !metaKey && !altKey) {
+      else if (shiftKey && key === "=" && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "+";
+        event.preventDefault();
+      }
+      else if (key === "*" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = "*";
         event.preventDefault();
       }
-      else if ((key === "%" || (shiftKey && key === "5")) && !ctrlKey && !metaKey && !altKey) {
+      else if (shiftKey && key === "8" && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "*";
+        event.preventDefault();
+      }
+      else if (key === "%" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = "%";
+        event.preventDefault();
       }
-      else if ((key === "(" || (shiftKey && key === "9")) && !ctrlKey && !metaKey && !altKey) {
+      else if (shiftKey && key === "5" && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "%";
+        event.preventDefault();
+      }
+      else if (key === "(" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = "(";
+        event.preventDefault();
       }
-      else if ((key === ")" || (shiftKey && key === "0")) && !ctrlKey && !metaKey && !altKey) {
+      else if (shiftKey && key === "9" && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "(";
+        event.preventDefault();
+      }
+      else if (key === ")" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = ")";
+        event.preventDefault();
       }
-      else if ((key === "=" || key === "Enter") && !ctrlKey && !metaKey && !altKey) {
+      else if (shiftKey && key === "0" && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = ")";
+        event.preventDefault();
+      }
+      else if (key === "=" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "=";
+        event.preventDefault();
+      }
+      else if (key === "Enter" && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = "=";
         event.preventDefault();
       }
@@ -133,9 +173,11 @@ function App() {
       }
       else if (key === "Escape" && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = "C";
+        event.preventDefault();
       }
       else if (key.toLowerCase() === "c" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
         calculatorAction = "C";
+        event.preventDefault();
       }
 
       if (calculatorAction) {
