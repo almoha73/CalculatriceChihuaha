@@ -99,83 +99,104 @@ function App() {
         return;
       }
 
-      const { key, shiftKey, ctrlKey, metaKey, altKey } = event;
+      const { key, shiftKey, ctrlKey, metaKey, altKey, code } = event;
       let calculatorAction: string | null = null;
 
-      // Empêcher les actions par défaut pour les touches de calculatrice
-      if (key >= "0" && key <= "9" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+      // Support des claviers AZERTY et QWERTY
+      // Chiffres - sur AZERTY ils sont en Shift, sur QWERTY ils sont directs
+      if (key >= "0" && key <= "9") {
         calculatorAction = key;
         event.preventDefault();
       }
-      else if ((key === "." || key === ",") && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+      // Support spécifique pour les codes de touches (plus fiable pour les layouts)
+      else if (code === "Digit0" || code === "Numpad0") {
+        calculatorAction = "0";
+        event.preventDefault();
+      }
+      else if (code === "Digit1" || code === "Numpad1") {
+        calculatorAction = "1";
+        event.preventDefault();
+      }
+      else if (code === "Digit2" || code === "Numpad2") {
+        calculatorAction = "2";
+        event.preventDefault();
+      }
+      else if (code === "Digit3" || code === "Numpad3") {
+        calculatorAction = "3";
+        event.preventDefault();
+      }
+      else if (code === "Digit4" || code === "Numpad4") {
+        calculatorAction = "4";
+        event.preventDefault();
+      }
+      else if (code === "Digit5" || code === "Numpad5") {
+        calculatorAction = "5";
+        event.preventDefault();
+      }
+      else if (code === "Digit6" || code === "Numpad6") {
+        calculatorAction = "6";
+        event.preventDefault();
+      }
+      else if (code === "Digit7" || code === "Numpad7") {
+        calculatorAction = "7";
+        event.preventDefault();
+      }
+      else if (code === "Digit8" || code === "Numpad8") {
+        calculatorAction = "8";
+        event.preventDefault();
+      }
+      else if (code === "Digit9" || code === "Numpad9") {
+        calculatorAction = "9";
+        event.preventDefault();
+      }
+      // Point décimal
+      else if ((key === "." || key === ",") || code === "NumpadDecimal") {
         calculatorAction = ".";
         event.preventDefault();
       }
-      else if (key === "/" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+      // Opérateurs
+      else if (key === "/" || code === "NumpadDivide" || code === "Slash") {
         calculatorAction = "/";
         event.preventDefault();
       }
-      else if (key === "-" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+      else if (key === "*" || code === "NumpadMultiply") {
+        calculatorAction = "*";
+        event.preventDefault();
+      }
+      else if (key === "-" || code === "NumpadSubtract" || code === "Minus") {
         calculatorAction = "-";
         event.preventDefault();
       }
-      else if (key === "+" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+      else if (key === "+" || code === "NumpadAdd" || code === "Equal") {
         calculatorAction = "+";
         event.preventDefault();
       }
-      else if (shiftKey && key === "=" && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "+";
-        event.preventDefault();
-      }
-      else if (key === "*" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "*";
-        event.preventDefault();
-      }
-      else if (shiftKey && key === "8" && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "*";
-        event.preventDefault();
-      }
-      else if (key === "%" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "%";
-        event.preventDefault();
-      }
-      else if (shiftKey && key === "5" && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "%";
-        event.preventDefault();
-      }
-      else if (key === "(" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+      // Parenthèses - support AZERTY et QWERTY
+      else if (key === "(" || (code === "Digit9" && shiftKey)) {
         calculatorAction = "(";
         event.preventDefault();
       }
-      else if (shiftKey && key === "9" && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "(";
-        event.preventDefault();
-      }
-      else if (key === ")" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+      else if (key === ")" || (code === "Digit0" && shiftKey)) {
         calculatorAction = ")";
         event.preventDefault();
       }
-      else if (shiftKey && key === "0" && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = ")";
+      // Pourcentage
+      else if (key === "%" || (code === "Digit5" && shiftKey)) {
+        calculatorAction = "%";
         event.preventDefault();
       }
-      else if (key === "=" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+      // Égal et Entrée
+      else if (key === "=" || key === "Enter" || code === "NumpadEnter") {
         calculatorAction = "=";
         event.preventDefault();
       }
-      else if (key === "Enter" && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "=";
-        event.preventDefault();
-      }
-      else if (key === "Backspace" && !ctrlKey && !metaKey && !altKey) {
+      // Effacement
+      else if (key === "Backspace") {
         calculatorAction = "⌫";
         event.preventDefault();
       }
-      else if (key === "Escape" && !ctrlKey && !metaKey && !altKey) {
-        calculatorAction = "C";
-        event.preventDefault();
-      }
-      else if (key.toLowerCase() === "c" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+      // Clear
+      else if (key === "Escape" || (key.toLowerCase() === "c" && !ctrlKey && !metaKey && !altKey)) {
         calculatorAction = "C";
         event.preventDefault();
       }
