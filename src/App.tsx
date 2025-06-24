@@ -50,25 +50,33 @@ function App() {
       if (result) setResult(null);
     }
     else if (value === "=") {
-      setInput(currentInput => {
-        if (!currentInput.trim()) return currentInput;
-        setIsCalculating(true);
-        
-        // Petit délai pour l'animation
-        setTimeout(() => {
-          try {
-            const res = eval(currentInput);
-            setResult(res.toString());
-            setHistory((prevHistory) => [`${currentInput} = ${res}`, ...prevHistory].slice(0, 15));
-            setIsCalculating(false);
-          } catch {
-            setResult("Erreur");
-            setIsCalculating(false);
-          }
-        }, 200);
-        
-        return currentInput;
-      });
+      if (!input.trim()) return;
+      
+      setIsCalculating(true);
+      
+      // Petit délai pour l'animation
+      setTimeout(() => {
+        try {
+          const res = eval(input);
+          const resultString = res.toString();
+          setResult(resultString);
+          
+          // Ajouter à l'historique seulement une fois
+          const historyEntry = `${input} = ${resultString}`;
+          setHistory((prevHistory) => {
+            // Vérifier si cette entrée existe déjà pour éviter les doublons
+            if (prevHistory[0] === historyEntry) {
+              return prevHistory;
+            }
+            return [historyEntry, ...prevHistory].slice(0, 15);
+          });
+          
+          setIsCalculating(false);
+        } catch {
+          setResult("Erreur");
+          setIsCalculating(false);
+        }
+      }, 200);
     }
     else if (value === "%") { 
       setInput((prev) => prev + "/100"); 
@@ -77,31 +85,64 @@ function App() {
       setInput((prev) => prev + value); 
       if (result) setResult(null);
     }
-  }, [result]);
+  }, [input, result]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const { key, shiftKey, ctrlKey, metaKey, altKey } = event;
       let calculatorAction: string | null = null;
 
-      if (key >= "0" && key <= "9" && !shiftKey && !ctrlKey && !metaKey && !altKey) calculatorAction = key;
-      else if ((key === "." || key === ",") && !shiftKey && !ctrlKey && !metaKey && !altKey) calculatorAction = ".";
-      else if (key === "/" && !shiftKey && !ctrlKey && !metaKey && !altKey) { calculatorAction = "/"; event.preventDefault(); }
-      else if (key === "-" && !shiftKey && !ctrlKey && !metaKey && !altKey) calculatorAction = "-";
-      else if ((key === "+" || (shiftKey && key === "=")) && !ctrlKey && !metaKey && !altKey) { calculatorAction = "+"; event.preventDefault(); }
-      else if ((key === "*" || (shiftKey && key === "8")) && !ctrlKey && !metaKey && !altKey) { calculatorAction = "*"; event.preventDefault(); }
-      else if ((key === "%" || (shiftKey && key === "5")) && !ctrlKey && !metaKey && !altKey) calculatorAction = "%";
-      else if ((key === "(" || (shiftKey && key === "9")) && !ctrlKey && !metaKey && !altKey) calculatorAction = "(";
-      else if ((key === ")" || (shiftKey && key === "0")) && !ctrlKey && !metaKey && !altKey) calculatorAction = ")";
-      else if ((key === "=" || key === "Enter") && !ctrlKey && !metaKey && !altKey) { calculatorAction = "="; event.preventDefault(); }
-      else if (key === "Backspace" && !ctrlKey && !metaKey && !altKey) { calculatorAction = "⌫"; event.preventDefault(); }
-      else if (key === "Escape" && !ctrlKey && !metaKey && !altKey) calculatorAction = "C";
-      else if (key.toLowerCase() === "c" && !shiftKey && !ctrlKey && !metaKey && !altKey) calculatorAction = "C";
+      // Empêcher les actions par défaut pour les touches de calculatrice
+      if (key >= "0" && key <= "9" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = key;
+      }
+      else if ((key === "." || key === ",") && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = ".";
+      }
+      else if (key === "/" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "/";
+        event.preventDefault();
+      }
+      else if (key === "-" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "-";
+      }
+      else if ((key === "+" || (shiftKey && key === "=")) && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "+";
+        event.preventDefault();
+      }
+      else if ((key === "*" || (shiftKey && key === "8")) && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "*";
+        event.preventDefault();
+      }
+      else if ((key === "%" || (shiftKey && key === "5")) && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "%";
+      }
+      else if ((key === "(" || (shiftKey && key === "9")) && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "(";
+      }
+      else if ((key === ")" || (shiftKey && key === "0")) && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = ")";
+      }
+      else if ((key === "=" || key === "Enter") && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "=";
+        event.preventDefault();
+      }
+      else if (key === "Backspace" && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "⌫";
+        event.preventDefault();
+      }
+      else if (key === "Escape" && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "C";
+      }
+      else if (key.toLowerCase() === "c" && !shiftKey && !ctrlKey && !metaKey && !altKey) {
+        calculatorAction = "C";
+      }
 
-      if (calculatorAction && BUTTONS.includes(calculatorAction)) {
+      if (calculatorAction) {
         processKeyPress(calculatorAction);
       }
     };
+
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [processKeyPress]);
@@ -180,7 +221,7 @@ function App() {
               const isEquals = btn === "=";
               const isNumber = /^[0-9.]$/.test(btn);
 
-              const baseClasses = "rounded-xl font-bold transition-all duration-150 active:scale-95 py-3 md:py-4 text-xl md:text-2xl shadow-lg hover:shadow-xl border-2 relative overflow-hidden";
+              const baseClasses = "rounded-xl font-bold transition-all duration-150 active:scale-95 py-3 md:py-4 text-xl md:text-2xl shadow-lg hover:shadow-xl border-2 relative overflow-hidden group";
               
               const numberClasses = `bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 text-gray-800 border-gray-300 shadow-gray-200/50 dark:from-neutral-700 dark:to-neutral-800 dark:hover:from-neutral-600 dark:hover:to-neutral-700 dark:text-white dark:border-neutral-600 dark:shadow-neutral-800/50`;
               
