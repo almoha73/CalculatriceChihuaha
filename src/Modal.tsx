@@ -4,7 +4,7 @@ interface ModalProps {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  titleId: string; // Pour aria-labelledby
+  titleId: string;
 }
 
 const Modal: React.FC<ModalProps> = ({ open, onClose, children, titleId }) => {
@@ -13,7 +13,6 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, children, titleId }) => {
 
   useEffect(() => {
     if (open) {
-      // Sélecteur pour les éléments focusables (déplacé à l'intérieur de l'effet)
       const FOCUSABLE_ELEMENTS_SELECTOR = [
         'a[href]:not([tabindex="-1"])',
         'button:not([disabled]):not([tabindex="-1"])',
@@ -34,7 +33,6 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, children, titleId }) => {
       const firstFocusableElement = focusableElements[0];
       const lastFocusableElement = focusableElements[focusableElements.length - 1];
 
-      // Mettre le focus sur le premier élément interactif ou la modale elle-même
       if (firstFocusableElement) {
         firstFocusableElement.focus();
       } else {
@@ -47,27 +45,24 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, children, titleId }) => {
           return;
         }
 
-        // Tab trapping
         if (event.key === "Tab") {
-          // Empêcher le comportement de tabulation par défaut pour rester dans la modale
           event.preventDefault();
 
           if (!focusableElements.length) {
-            // S'il n'y a aucun élément focusable, on ne fait rien de plus (le focus reste sur la modale)
             return;
           }
 
           const activeElement = document.activeElement as HTMLElement;
           const currentIndex = focusableElements.indexOf(activeElement);
 
-          if (event.shiftKey) { // Shift + Tab
-            if (currentIndex === 0 || currentIndex === -1) { // Si sur le premier ou focus sur la modale elle-même
+          if (event.shiftKey) {
+            if (currentIndex === 0 || currentIndex === -1) {
               lastFocusableElement?.focus();
             } else {
               focusableElements[currentIndex - 1]?.focus();
             }
-          } else { // Tab
-            if (currentIndex === focusableElements.length - 1 || currentIndex === -1) { // Si sur le dernier ou focus sur la modale
+          } else {
+            if (currentIndex === focusableElements.length - 1 || currentIndex === -1) {
               firstFocusableElement?.focus();
             } else {
               focusableElements[currentIndex + 1]?.focus();
@@ -87,18 +82,31 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, children, titleId }) => {
 
   return (
     <div
-      className="fixed z-[1000] inset-0 flex items-center justify-center p-5 bg-black/50"
+      className="fixed z-[1000] inset-0 flex items-center justify-center p-5 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
       ref={modalRef}
-      tabIndex={-1} // Permet à la div d'être focusable par programmation
+      tabIndex={-1}
     >
+      {/* Animation d'entrée */}
       <div
-        className="bg-yellow-50 dark:bg-neutral-900 rounded-2xl p-6 min-w-[300px] max-w-[90vw] max-h-[80vh] overflow-y-auto shadow-xl border-2 border-yellow-300 dark:border-neutral-700 relative"
+        className="bg-white/95 dark:bg-neutral-900/95 rounded-3xl p-6 min-w-[320px] max-w-[90vw] max-h-[85vh] overflow-y-auto shadow-2xl border-2 border-orange-200/50 dark:border-orange-600/30 relative backdrop-blur-xl transform transition-all duration-300 scale-100 opacity-100"
         onClick={e => e.stopPropagation()}
+        style={{
+          animation: open ? 'modalEnter 0.3s ease-out' : 'modalExit 0.2s ease-in'
+        }}
       >
+        {/* Bouton de fermeture amélioré */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-orange-100 dark:bg-neutral-700 hover:bg-orange-200 dark:hover:bg-neutral-600 transition-colors duration-200 flex items-center justify-center text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-200 z-10"
+          aria-label="Fermer la modal"
+        >
+          ✕
+        </button>
+        
         {children}
       </div>
     </div>
